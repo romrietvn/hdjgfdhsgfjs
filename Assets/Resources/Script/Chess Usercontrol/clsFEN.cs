@@ -64,20 +64,47 @@ namespace Chess_Usercontrol
 
 			if (Board._EnPassantPoint != new UnityEngine.Vector2())
             {
-				strEnPassant = "ucchesscell";
+				switch ((int)Board._EnPassantPoint.x) 
+				{
+					case 1:
+						strEnPassant = "a";
+						break;
+					case 2:
+						strEnPassant = "b";
+						break;
+					case 3:
+						strEnPassant = "c";
+						break;
+					case 4:
+						strEnPassant = "d";
+						break;
+					case 5:
+						strEnPassant = "e";
+						break;
+					case 6:
+						strEnPassant = "f";
+						break;
+					case 7:
+						strEnPassant = "g";
+						break;
+					case 8:
+						strEnPassant = "h";
+						break;
+				}
+				strEnPassant += (9 - (int)Board._EnPassantPoint.y);
             }
 
-//            if (UcChessBoard.KINGsideCastling == true)
-//                strCastling += "K";
-//
-//            if (UcChessBoard.QUEENsideCastling == true)
-//                strCastling += "Q";
-//
-//            if (UcChessBoard.kingsideCastling == true)
-//                strCastling += "k";
-//
-//            if (UcChessBoard.queensideCastling == true)
-//                strCastling += "q";
+			            if (Board.KINGsideCastling == true)
+                strCastling += "K";
+
+			            if (Board.QUEENsideCastling == true)
+                strCastling += "Q";
+
+			            if (Board.kingsideCastling == true)
+                strCastling += "k";
+
+			            if (Board.queensideCastling == true)
+                strCastling += "q";
 
             if (strCastling == "")
                 strCastling = "-";
@@ -86,68 +113,55 @@ namespace Chess_Usercontrol
             return FEN;
         }
 
-//        public static void SetFEN(UcChessBoard Board, string strFEN)
-//        {
-//            strFEN = strFEN.Trim();
-//            string[] s = strFEN.Split(' ');
-//            if(s.Length ==1)
-//            {
-//                SetPiecePlacement(Board._BoardState, strFEN);
-//                return;
-//            }
-//
-//            string strPiecePlacemen = s[0];
-//            string strActiveSide = s[1];
-//            string strCastling = s[2];
-//            string strEnPassant = s[3];
-//            int intHalfMoveClock = 0;
-//            int intFullMoveNumBer = 0;
-//
-//            if (s.Length == 5)
-//            {
-//                intHalfMoveClock = Convert.ToInt32(s[4]);
-//            }
-//            if (s.Length == 6)
-//            {
-//                intFullMoveNumBer = Convert.ToInt32(s[5]);
-//            }
-//
-//            SetPiecePlacement(Board._BoardState, strPiecePlacemen);
-//
-//            if (strActiveSide.ToUpper() == "W")
-//                Board.WhiteToMove = true;
-//            else
-//                Board.WhiteToMove = false;
-//
-//            UcChessBoard.KINGsideCastling = false;
-//            UcChessBoard.kingsideCastling = false;
-//            UcChessBoard.QUEENsideCastling = false;
-//            UcChessBoard.queensideCastling = false;
-//
-//            if (strCastling != "-")
-//            {
-//                foreach (char c in strCastling)
-//                {
-//                    switch (c)
-//                    {
-//                        case 'Q': UcChessBoard.QUEENsideCastling = true; break;
-//                        case 'K': UcChessBoard.KINGsideCastling = true; break;
-//
-//                        case 'q': UcChessBoard.queensideCastling = true; break;
-//                        case 'k': UcChessBoard.kingsideCastling = true; break;
-//                    }
-//                }
-//            }
+		public static void SetFEN(PlayGameController Board, string strFEN)
+        {
+			strFEN = DefaultFENstring;
+            strFEN = strFEN.Trim();
+            string[] s = strFEN.Split(' ');
+            if(s.Length ==1)
+            {
+                SetPiecePlacement(Board._BoardState, strFEN);
+                return;
+            }
+
+            string strPiecePlacemen = s[0];
+            string strActiveSide = s[1];
+            string strCastling = s[2];
+            string strEnPassant = s[3];
+
+            SetPiecePlacement(Board._BoardState, strPiecePlacemen);
+
+			Board.isWhite = strActiveSide.ToUpper () == "W" ? ChessSide.White : ChessSide.Black;
+
+			Board.KINGsideCastling = false;
+			Board.kingsideCastling = false;
+			Board.QUEENsideCastling = false;
+			Board.queensideCastling = false;
+
+            if (strCastling != "-")
+            {
+                foreach (char c in strCastling)
+                {
+                    switch (c)
+                    {
+					case 'Q': Board.QUEENsideCastling = true; break;
+					case 'K': Board.KINGsideCastling = true; break;
+
+					case 'q': Board.queensideCastling = true; break;
+					case 'k': Board.kingsideCastling = true; break;
+                    }
+                }
+            }
 //            if (strEnPassant != "-")
 //            {
-//                UcChessCell cell = (UcChessCell)Board.Controls.Find(strEnPassant, true)[0];
-//                UcChessBoard._EnPassantPoint = new Point(cell.PositionX, cell.PositionY);
+//                //UcChessCell cell = (UcChessCell)Board.Controls.Find(strEnPassant, true)[0];
+//                //UcChessBoard._EnPassantPoint = new Point(cell.PositionX, cell.PositionY);
 //            }
 //            else
 //                UcChessBoard._EnPassantPoint = new Point();
-//
-//            Board.HalfMoveClock = intHalfMoveClock;
-//        }
+			Board._EnPassantPoint = new UnityEngine.Vector2();
+
+        }
 
         public static void SetPiecePlacement(int[,] BoardState, string strPieceplacement)
         {

@@ -7,7 +7,8 @@ public enum GameStatus
 	NowPlaying = 0,
 	BlackWin = 1,
 	WhiteWin = 2,
-	Draw = 3
+	Draw = 3,
+	Pause = 4
 }
 
 public enum ChessSide

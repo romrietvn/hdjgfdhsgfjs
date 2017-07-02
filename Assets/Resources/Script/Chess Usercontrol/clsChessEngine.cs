@@ -25,6 +25,15 @@ namespace Chess_Usercontrol
 		static clsMove MyBestMove = new clsMove();
 		// static long NodeCount = 0;
 
+		public static IEnumerator InitBook()
+		{
+			TextAsset leveltext = Resources.Load("book") as TextAsset;
+			textInBook = leveltext.text;
+			lineText = textInBook.Split(new [] { '\r', '\n' });
+			yield return null;
+			isFirstTime = false;
+		}
+
 		#region "Game Logic"
 		public static ArrayList FindAllPossibleMove(int[,] arrState, Vector2 CurPos, ChessPieceType eType)
 		{
@@ -697,18 +706,19 @@ namespace Chess_Usercontrol
 		#endregion
 
 		# region "Successors(Hàm Tìm Tất Cả Các Nước Đi Hợp Lệ)"
-		private static ArrayList Successors(int[,] BoardState, ChessSide eSide)
+		 private static ArrayList Successors(int[,] BoardState, ChessSide eSide)
 		{
 
 			int intSide = 0;
 			if (eSide == ChessSide.White)
 			{
-				intSide = 2;
+				intSide = 1;
 			}
 			else
 			{
-				intSide = 1;
+				intSide = 2;
 			}
+
 			ArrayList arrMoves = new ArrayList();
 			for (int y = 1; y <= 8; y++)
 				for (int x = 1; x <= 8; x++)
@@ -808,29 +818,20 @@ namespace Chess_Usercontrol
 		#endregion
 
 //		#region "Hàm Tạo Nước Đi Hợp Lệ Áp Dụng Giải Thuật MiniMax"
-		static string strBookPath = "strBookPath";
 //
 //		//Tìm trạng thái bàn cờ trong Opening Book nếu tìm được trong Opening book=> trả về nước đi trong Opening Book
-		static bool isFirstTime = true;
+		public static bool isFirstTime = true;
 		static string textInBook = "";
 		static string[] lineText;
 		public static clsMove ReadFromBook(string strFEN)
 		{
-			if (isFirstTime) 
-			{
-				isFirstTime = false;
-				TextAsset leveltext = Resources.Load("book") as TextAsset;
-				textInBook = leveltext.text;
-				lineText = textInBook.Split(new [] { '\r', '\n' });
-			}
-
 			if (lineText == null)
 				return null;
 			try
 			{
 				foreach(var tmp in lineText)
 				{
-					if (tmp.StartsWith(strFEN))
+					if (tmp.Contains(strFEN))
 					{
 						string[] strMove = tmp.Split(' ');
 						int count = strMove.Length;

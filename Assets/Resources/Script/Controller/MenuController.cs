@@ -24,16 +24,21 @@ public class MenuController : MonoBehaviour {
 	{
 		HideMenu ();
 		SceneManager.instance.AiModeController.ShowScreen ();
+		SceneManager.instance.ModeGamePlay = PlayGameController.GameMode.OnePlayer;
 	}
 
 	public void OnTwoModeClick()
 	{
-		
+		HideMenu ();
+		SceneManager.instance.PlayGameController.ShowScreen ();
+		SceneManager.instance.ModeGamePlay = PlayGameController.GameMode.TwoPlayer;
 	}
 
 	public void OnPuzzleModeClick()
 	{
-		
+		HideMenu ();
+		SceneManager.instance.AiModeController.ShowScreen ();
+		SceneManager.instance.ModeGamePlay = PlayGameController.GameMode.Puzzle;
 	}
 
 	public void OnSettingClick()

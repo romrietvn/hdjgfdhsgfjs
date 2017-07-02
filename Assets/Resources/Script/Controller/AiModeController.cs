@@ -24,15 +24,15 @@ public class AiModeController : MonoBehaviour {
 	{
 		if (index == 1) 
 		{
-			SceneManager.instance.Difficult = SceneManager.ModeDifficult.Ez;
+			SceneManager.instance.Difficult = GameDifficulty.Easy;
 		} 
 		else if (index == 2) 
 		{
-			SceneManager.instance.Difficult = SceneManager.ModeDifficult.Medium;
+			SceneManager.instance.Difficult = GameDifficulty.Normal;
 		}
 		else 
 		{
-			SceneManager.instance.Difficult = SceneManager.ModeDifficult.Hard;
+			SceneManager.instance.Difficult = GameDifficulty.Hard;
 		}
 		HideScreen ();
 		SceneManager.instance.PlayGameController.ShowScreen ();

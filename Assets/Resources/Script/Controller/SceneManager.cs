@@ -8,28 +8,14 @@ public class SceneManager : MonoBehaviour {
 	public const string DIFFICULT = "DIFFICULT";
 	public const string MODEGAMEPLAY = "MODEGAMEPLAY";
 
-	public enum  ModePlay
-	{
-		One,
-		Two,
-		Puzzle		
-	}
-
-	public enum ModeDifficult 
-	{
-		Ez,
-		Medium,
-		Hard
-	}
-
 	public static SceneManager instance;
 	public MenuController MenuController;
 	public AiModeController AiModeController;
 	public PlayGameController PlayGameController;
 
 	public bool IsWhiteFirst = true;
-	public ModeDifficult Difficult = ModeDifficult.Ez;
-	public ModePlay ModeGamePlay = ModePlay.One;
+	public GameDifficulty Difficult = GameDifficulty.Easy;
+	public PlayGameController.GameMode ModeGamePlay = PlayGameController.GameMode.OnePlayer;
 
 	void Awake() 
 	{
@@ -46,5 +32,6 @@ public class SceneManager : MonoBehaviour {
 		MenuController.ShowMenu();
 		AiModeController.HideScreen();
 		PlayGameController.HideScreen ();
+		StartCoroutine (Chess_Usercontrol.clsChessEngine.InitBook());
 	}
 }
