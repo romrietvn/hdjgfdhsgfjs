@@ -64,6 +64,7 @@
      <Compile Include="Assets\Resources\Script\View\EnumHolder.cs" />
      <Compile Include="Assets\Resources\Script\View\MapData.cs" />
      <None Include="Assets\Resources\book.txt" />
+     <None Include="Assets\Resources\level.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

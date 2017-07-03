@@ -45,6 +45,7 @@ public class PlayGameController : MonoBehaviour {
 
 	public bool KINGsideCastling = true;//Nhập thành gần, quân trắng        
 	public bool QUEENsideCastling = true;//Nhập thành xa, quân trắng
+	public int CurrentLevel = 0;
 
 	void Awake() 
 	{
@@ -98,11 +99,11 @@ public class PlayGameController : MonoBehaviour {
 //		Rook = 3,//Xe
 //		Queen = 4,//Hậu
 //		King = 5,//Vua
-
-		string mapData = "1-0-0-3;1-7-0-3;1-1-0-2;1-6-0-2;1-2-0-1;1-5-0-1;1-3-0-5;1-4-0-4;" +
-			"1-0-1-0;1-1-1-0;1-2-1-0;1-3-1-0;1-4-1-0;1-5-1-0;1-6-1-0;1-7-1-0;" + 
-			"0-0-6-0;0-1-6-0;0-2-6-0;0-3-6-0;0-4-6-0;0-5-6-0;0-6-6-0;0-7-6-0;" + 
-			"0-0-7-3;0-7-7-3;0-1-7-2;0-6-7-2;0-2-7-1;0-5-7-1;0-3-7-5;0-4-7-4;";
+		string mapData = "";
+		CurrentLevel = SceneManager.instance.CurrentLevel;
+		if (CurrentLevel < SceneManager.instance.LevelData.Count)
+			mapData = SceneManager.instance.LevelData [CurrentLevel];
+		else mapData = SceneManager.instance.LevelData [0];
 
 		var temp = mapData.Split (';');
 		foreach (var item in temp) 
@@ -239,9 +240,8 @@ public class PlayGameController : MonoBehaviour {
 		{
 			MyMove = new clsMove(new Vector2(), new Vector2());
 			arrMove = clsChessEngine.GenerateMove(this._BoardState, this.arrFEN, ChessSide.Black, ref MyMove, Difficult);
-			if (Difficult == GameDifficulty.Hard)
-				clsChessEngine.WriteToBook(strFen, MyMove);
-			
+//			if (Difficult == GameDifficulty.Hard)
+//				clsChessEngine.WriteToBook(strFen, MyMove);
 		}
 		else
 		{

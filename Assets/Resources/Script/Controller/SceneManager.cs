@@ -16,6 +16,9 @@ public class SceneManager : MonoBehaviour {
 	public bool IsWhiteFirst = true;
 	public GameDifficulty Difficult = GameDifficulty.Easy;
 	public PlayGameController.GameMode ModeGamePlay = PlayGameController.GameMode.OnePlayer;
+	public int MaxLevel = 0;
+	public int CurrentLevel = 0;
+	public List<string> LevelData = new List<string>();
 
 	void Awake() 
 	{
@@ -23,6 +26,7 @@ public class SceneManager : MonoBehaviour {
 		{
 			instance = this;
 		}
+		InitLevel ();
 		DontDestroyOnLoad(this.gameObject);
 	}
 
@@ -33,5 +37,17 @@ public class SceneManager : MonoBehaviour {
 		AiModeController.HideScreen();
 		PlayGameController.HideScreen ();
 		StartCoroutine (Chess_Usercontrol.clsChessEngine.InitBook());
+	}
+
+	void InitLevel() 
+	{
+		TextAsset leveltext = Resources.Load("level") as TextAsset;
+		string textInBook = leveltext.text;
+		string[] lineText = textInBook.Split(new [] { '\r', '\n' });
+		LevelData.Clear ();
+		for (int i = 0; i < lineText.Length; i++) 
+		{
+			LevelData.Add (lineText [i]);
+		}
 	}
 }

@@ -66,8 +66,8 @@ namespace Chess_Usercontrol
 			if (eType == ChessPieceType.King)
 			{
 				arrMove = clsKing.FindAllPossibleMove(arrState, CurPos);
-				ChessSide eSide = (ChessSide)(arrState[(int)CurPos.x, (int)CurPos.y] % 10);
-				//clsKing.AddCastlingVector2(arrState, eSide, arrMove);
+//				ChessSide eSide = (ChessSide)(arrState[(int)CurPos.x, (int)CurPos.y] % 10);
+//				clsKing.AddCastlingVector2(arrState, eSide, arrMove);
 
 			}
 			return arrMove;
@@ -103,40 +103,40 @@ namespace Chess_Usercontrol
 			return intMobility;
 		}
 
-		///// <summary>
-		///// Trả về độ di động của phe ta trừ phe địch
-		///// </summary>
-		//static int Mobility(int[,] BoardState)
-		//{
+		/// <summary>
+		/// Trả về độ di động của phe ta trừ phe địch
+		/// </summary>
+		static int Mobility(int[,] BoardState)
+		{
 
-		//    int intSide = 0;
-		//    if (Myside == ChessSide.White)
-		//    {
-		//        intSide = 2;
-		//    }
-		//    else
-		//    {
-		//        intSide = 1;
-		//    }
-		//    int intMobility = 0;
-		//    for (int y = 1; y <= 8; y++)
-		//        for (int x = 1; x <= 8; x++)
-		//            if (BoardState[x, y] > 0)
-		//            {
-		//                int side = BoardState[x, y] % 10;
+		    int intSide = 0;
+		    if (Myside == ChessSide.White)
+		    {
+		        intSide = 2;
+		    }
+		    else
+		    {
+		        intSide = 1;
+		    }
+		    int intMobility = 0;
+		    for (int y = 1; y <= 8; y++)
+		        for (int x = 1; x <= 8; x++)
+		            if (BoardState[x, y] > 0)
+		            {
+		                int side = BoardState[x, y] % 10;
 
-		//                int intType = BoardState[x, y] / 10;
-		//                if (side == intSide)
-		//                {
-		//                    intMobility += FindAllLegalMove(BoardState, new Point(x, y), (ChessPieceType)intType).Count;
-		//                }
-		//                else
-		//                {
-		//                    intMobility -= FindAllLegalMove(BoardState, new Point(x, y), (ChessPieceType)intType).Count;
-		//                }
-		//            }
-		//    return intMobility;
-		//}
+		                int intType = BoardState[x, y] / 10;
+		                if (side == intSide)
+		                {
+							intMobility += FindAllLegalMove(BoardState, new Vector2(x, y), (ChessPieceType)intType).Count;
+		                }
+		                else
+		                {
+							intMobility -= FindAllLegalMove(BoardState, new Vector2(x, y), (ChessPieceType)intType).Count;
+		                }
+		            }
+		    return intMobility;
+		}
 
 		public static ArrayList FindAllLegalMove(int[,] arrState, Vector2 CurPos, ChessPieceType eType)
 		{
@@ -811,8 +811,8 @@ namespace Chess_Usercontrol
 			ArrayList arrMoves = Successors(BoardState, eSide);
 			if (arrMoves.Count == 0)
 				return null;
-			System.Random rd = new System.Random(arrMoves.Count);
-			int value = rd.Next(arrMoves.Count);
+			Debug.LogError (111);
+			int value = UnityEngine.Random.Range (0, arrMoves.Count);
 			return (clsMove)arrMoves[value];
 		}
 		#endregion
@@ -835,8 +835,7 @@ namespace Chess_Usercontrol
 					{
 						string[] strMove = tmp.Split(' ');
 						int count = strMove.Length;
-						System.Random rd = new System.Random();
-						count = rd.Next(count);
+						count = UnityEngine.Random.Range (0, count);
 						string result = strMove[count];
 
 						clsMove Move = new clsMove(result);
@@ -876,9 +875,9 @@ namespace Chess_Usercontrol
 			if (eDifficult != GameDifficulty.Easy)
 			{
 				if (eDifficult == GameDifficulty.Normal)
-					MaxDepth = 4;//Normal
+					MaxDepth = 2;//Normal
 				else
-					MaxDepth = 6;//Hard
+					MaxDepth = 4;//Hard
 
 				Myside = eSide;
 				if (Myside == ChessSide.Black)
