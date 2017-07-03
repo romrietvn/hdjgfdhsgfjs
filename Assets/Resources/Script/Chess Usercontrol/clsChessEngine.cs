@@ -875,9 +875,9 @@ namespace Chess_Usercontrol
 			if (eDifficult != GameDifficulty.Easy)
 			{
 				if (eDifficult == GameDifficulty.Normal)
-					MaxDepth = 2;//Normal
+					MaxDepth = 4;//Normal
 				else
-					MaxDepth = 4;//Hard
+					MaxDepth = 6;//Hard
 
 				Myside = eSide;
 				if (Myside == ChessSide.Black)

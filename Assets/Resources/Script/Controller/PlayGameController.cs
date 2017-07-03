@@ -27,7 +27,7 @@ public class PlayGameController : MonoBehaviour {
 	private CellBase preCell;
 
 	private MapData currentMap;
-	public ChessSide isWhite = ChessSide.White;
+	public ChessSide isWhite = ChessSide.Black;
 	public Vector2 _EnPassantVector2 = new Vector2();
 	public int[,] _BoardState = new int[10, 10];
 	public GameStatus CurrentStatus = GameStatus.NowPlaying;
@@ -115,7 +115,7 @@ public class PlayGameController : MonoBehaviour {
 				newChess.IsWhite = parts [0] == "0" ? ChessSide.White : ChessSide.Black;
 				newChess.Position = new Vector2(int.Parse(parts[1]),int.Parse(parts[2]));
 				newChess.Type = (ChessPieceType)(int.Parse (parts [3]) + 1);
-				int index = newChess.IsWhite == ChessSide.White ? 1 : 2;
+				int index = newChess.IsWhite == ChessSide.White ? 2 : 1;
 				_BoardState[(int)newChess.Position.x + 1, (int)newChess.Position.y + 1] = (int)newChess.Type * 10 + index;
 				AllChess.Add (newChess);
 			}
@@ -158,7 +158,7 @@ public class PlayGameController : MonoBehaviour {
 		if (CurrentStatus != GameStatus.NowPlaying || isThinking)
 			return;
 
-		if (CurrentGameMode == GameMode.TwoPlayer || isWhite == ChessSide.White) 
+		if (CurrentGameMode == GameMode.TwoPlayer || isWhite == ChessSide.Black) 
 		{
 			if (cell.CurrentType != null && cell.CellStatus == CellBase.CellType.None && cell.CurrentType.IsWhite == isWhite) {
 				if (preCell != null) {
@@ -203,7 +203,7 @@ public class PlayGameController : MonoBehaviour {
 				} 
 				else 
 				{
-					int index = cell.CurrentType.IsWhite == ChessSide.White ? 1 : 2;
+					int index = cell.CurrentType.IsWhite == ChessSide.White ? 2 : 1;
 					int X = 8 - (int)cell.PosX;
 					int Y = (int)cell.PosY + 1;
 					_BoardState [ X, Y] = (int)cell.CurrentType.Type * 10 + index;
@@ -239,7 +239,9 @@ public class PlayGameController : MonoBehaviour {
 		if (MyMove == null)
 		{
 			MyMove = new clsMove(new Vector2(), new Vector2());
-			arrMove = clsChessEngine.GenerateMove(this._BoardState, this.arrFEN, ChessSide.Black, ref MyMove, Difficult);
+			arrMove = clsChessEngine.GenerateMove(this._BoardState, this.arrFEN, ChessSide.White, ref MyMove, Difficult);
+			Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
+
 //			if (Difficult == GameDifficulty.Hard)
 //				clsChessEngine.WriteToBook(strFen, MyMove);
 		}
@@ -253,7 +255,7 @@ public class PlayGameController : MonoBehaviour {
 		AiMove ();
 		Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
 		isThinking = false;
-		isWhite = ChessSide.White;
+		isWhite = ChessSide.Black;
 		arrFEN.Add(clsFEN.GetPiecePlacementString(this._BoardState));
 	}
 
@@ -264,23 +266,23 @@ public class PlayGameController : MonoBehaviour {
 			CellBase curCell = new CellBase(), newCell = new CellBase();
 			foreach(var item in AllCell)
 			{
-				if (8 - item.PosX == (int)MyMove.CurPos.x && item.PosY + 1 == (int)MyMove.CurPos.y) 
+				if (item.PosX == 8 - (int)MyMove.CurPos.x && item.PosY == 8 - (int)MyMove.CurPos.y) 
 				{
 					curCell = item;
 				}
 
-				if (8 - item.PosX == (int)MyMove.NewPos.x && item.PosY + 1 == (int)MyMove.NewPos.y) 
+				if (item.PosX == 8 - (int)MyMove.NewPos.x && item.PosY == 8 - (int)MyMove.NewPos.y) 
 				{
 					newCell = item;
 				}
 			}
 
-			if (curCell.CurrentType != null && curCell.CurrentType.IsWhite == ChessSide.Black) 
+			if (curCell.CurrentType != null && curCell.CurrentType.IsWhite == ChessSide.White) 
 			{
 				newCell.SetView (curCell.CurrentType);
-				_BoardState [8 - (int)curCell.PosX, (int)curCell.PosY + 1] = 0;
+				_BoardState [8 - (int)curCell.PosX, 8 - (int)curCell.PosY] = 0;
 				curCell.ClearView ();
-				_BoardState [8 - (int)newCell.CurrentType.Position.x, (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
+				_BoardState [8 - (int)newCell.CurrentType.Position.x, 8 - (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
 			}
 		}
 	}
@@ -308,7 +310,7 @@ public class PlayGameController : MonoBehaviour {
 			switch ((int)cell.CurrentType.Type) 
 			{
 			case 1:
-				return clsPawn.FindAllPossibleMove (_BoardState, new Vector2 (8 - cell.PosX , cell.PosY + 1));
+				return clsPawn.FindAllPossibleMove (_BoardState, new Vector2 (8 - cell.PosX, cell.PosY + 1));
 			case 2:
 				return clsBishop.FindAllPossibleMove (_BoardState, new Vector2 (8 - cell.PosX, cell.PosY + 1));
 			case 3:

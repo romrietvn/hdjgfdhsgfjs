@@ -7,45 +7,46 @@ namespace Chess_Usercontrol
     {
         public static string DefaultFENstring = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-//        public static string GetFEN(UcChessBoard Board)
-//        {
-//            string FEN = "";
-//
-//            string strActiveSide = "";
-//            string strCastling = "";
-//            string strEnPassant = "-";
-//            int intHalfMoveClock = Board.HalfMoveClock;
-//            int intFullMoveNumBer = Board.FullMovesNumber;
-//            string strPiecePlacemen = GetPiecePlacementString(Board._BoardState);
-//
-//            if (Board.WhiteToMove == true)
-//                strActiveSide = "w";
-//            else
-//                strActiveSide = "b";
-//
-//            if (UcChessBoard._EnPassantPoint != new Point())
-//            {
-//                strEnPassant = Board.arrChessCell[UcChessBoard._EnPassantPoint.X, UcChessBoard._EnPassantPoint.Y].Name.ToLower();
-//            }
-//
-//            if (UcChessBoard.KINGsideCastling == true)
-//                strCastling += "K";
-//
-//            if (UcChessBoard.QUEENsideCastling == true)
-//                strCastling += "Q";
-//
-//            if (UcChessBoard.kingsideCastling == true)
-//                strCastling += "k";
-//
-//            if (UcChessBoard.queensideCastling == true)
-//                strCastling += "q";
-//
-//            if (strCastling == "")
-//                strCastling = "-";
-//            FEN = strPiecePlacemen + " " + strActiveSide + " " + strCastling + " " + strEnPassant + " " + intHalfMoveClock + " " + intFullMoveNumBer;
-//
-//            return FEN;
-//        }
+		public static string GetFEN(PlayGameController Board)
+        {
+            string FEN = "";
+
+            string strActiveSide = "";
+            string strCastling = "";
+            string strEnPassant = "-";
+            int intHalfMoveClock = 0;
+            int intFullMoveNumBer = 1;
+
+            string strPiecePlacemen = GetPiecePlacementString(Board._BoardState);
+			UnityEngine.Debug.LogError (strPiecePlacemen);
+			if (Board.isWhite == ChessSide.White)
+                strActiveSide = "w";
+            else
+                strActiveSide = "b";
+
+			if (Board._EnPassantPoint != new UnityEngine.Vector2())
+            {
+                //strEnPassant = Board.arrChessCell[UcChessBoard._EnPassantPoint.X, UcChessBoard._EnPassantPoint.Y].Name.ToLower();
+            }
+
+			if (Board.KINGsideCastling == true)
+                strCastling += "K";
+
+			if (Board.QUEENsideCastling == true)
+                strCastling += "Q";
+
+			if (Board.kingsideCastling == true)
+                strCastling += "k";
+
+			if (Board.queensideCastling == true)
+                strCastling += "q";
+
+            if (strCastling == "")
+                strCastling = "-";
+            FEN = strPiecePlacemen + " " + strActiveSide + " " + strCastling + " " + strEnPassant + " " + intHalfMoveClock + " " + intFullMoveNumBer;
+
+            return FEN;
+        }
 
 		public static string GetFENWithoutMoveNumber(PlayGameController Board)
         {
@@ -115,7 +116,7 @@ namespace Chess_Usercontrol
 
 		public static void SetFEN(PlayGameController Board, string strFEN)
         {
-			strFEN = DefaultFENstring;
+			strFEN = GetFEN(Board);
             strFEN = strFEN.Trim();
             string[] s = strFEN.Split(' ');
             if(s.Length ==1)
@@ -216,7 +217,7 @@ namespace Chess_Usercontrol
         public static string GetPiecePlacementString(int[,] BoardState)
         {
             string strPiecePlacemen = "";
-            for (int y = 8; y >= 1; y--)
+            for (int y = 8; y >= 0; y--)
             {
                 int count = 0;
                 for (int x = 1; x <= 8; x++)
@@ -231,9 +232,9 @@ namespace Chess_Usercontrol
                             count = 0;
                         }
                         int type = (BoardState[x, y] / 10);
-                        ChessSide side = (ChessSide)(BoardState[x, y] % 10);
+                        int side = (BoardState[x, y] % 10);
 
-                        if (side == ChessSide.Black)
+                        if (side == 1)
                         {
                             switch (type)
                             {
@@ -264,7 +265,7 @@ namespace Chess_Usercontrol
                     strPiecePlacemen += count;
                     count = 0;
                 }
-                if (y > 1)
+                if (y > 0)
                     strPiecePlacemen += "/";
             }
             return strPiecePlacemen;
