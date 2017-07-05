@@ -811,7 +811,6 @@ namespace Chess_Usercontrol
 			ArrayList arrMoves = Successors(BoardState, eSide);
 			if (arrMoves.Count == 0)
 				return null;
-			Debug.LogError (111);
 			int value = UnityEngine.Random.Range (0, arrMoves.Count);
 			return (clsMove)arrMoves[value];
 		}
@@ -867,8 +866,10 @@ namespace Chess_Usercontrol
 		}
 		//Code change ngày 30/07/2010
 		//Thêm đối số để phục vụ cho việc xác định các nước đi bất biến 3 lần
+		public static bool isProcessing = false;
 		public static ArrayList GenerateMove(int[,] BoardState,ArrayList arrFEN, ChessSide eSide, ref clsMove Move, GameDifficulty eDifficult)
 		{
+			isProcessing = true;
 			ArrayList arrMove = new ArrayList();
 			//NodeCount = 0;         
 			MyBestMove = new clsMove();
@@ -905,8 +906,10 @@ namespace Chess_Usercontrol
 			else
 			{
 				Move = RandomMove(BoardState, eSide);
-				Move.PromoteTo = ChessPieceType.Queen;
+				if (Move != null)
+					Move.PromoteTo = ChessPieceType.Queen;
 			}
+			isProcessing = false;
 			if (Move == null)
 				return arrMove;
 

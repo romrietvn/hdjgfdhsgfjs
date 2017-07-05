@@ -56,11 +56,13 @@
      <Compile Include="Assets\Resources\Script\Chess Usercontrol\clsQueen.cs" />
      <Compile Include="Assets\Resources\Script\Chess Usercontrol\clsRook.cs" />
      <Compile Include="Assets\Resources\Script\Controller\AiModeController.cs" />
+     <Compile Include="Assets\Resources\Script\Controller\MapEditorController.cs" />
      <Compile Include="Assets\Resources\Script\Controller\MenuController.cs" />
      <Compile Include="Assets\Resources\Script\Controller\PlayGameController.cs" />
      <Compile Include="Assets\Resources\Script\Controller\SceneManager.cs" />
      <Compile Include="Assets\Resources\Script\View\CellBase.cs" />
      <Compile Include="Assets\Resources\Script\View\ChessBase.cs" />
+     <Compile Include="Assets\Resources\Script\View\ChessEdit.cs" />
      <Compile Include="Assets\Resources\Script\View\EnumHolder.cs" />
      <Compile Include="Assets\Resources\Script\View\MapData.cs" />
      <None Include="Assets\Resources\book.txt" />

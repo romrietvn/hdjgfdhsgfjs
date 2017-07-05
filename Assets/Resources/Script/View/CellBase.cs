@@ -15,6 +15,7 @@ public class CellBase : MonoBehaviour
 	public Image image;
 	public ChessBase CurrentType;
 	public PlayGameController MainController;
+	public MapEditorController MapEditor;
 
 	public int PosX = 0;
 	public int PosY = 0;
@@ -73,7 +74,10 @@ public class CellBase : MonoBehaviour
 
 	public void OnCurrentChessClick()
 	{
-		MainController.SelectingThisCell (this);
+		if (MainController != null)
+			MainController.SelectingThisCell (this);
+		else
+			MapEditor.OnCellClick (this);
 	}
 
 	private int GetChess(ChessBase chess)
@@ -82,5 +86,17 @@ public class CellBase : MonoBehaviour
 		if (chess.IsWhite == ChessSide.White)
 			index += 6;
 		return index;
+	}
+
+	public void SetViewEditor(ChessBase chess)
+	{
+		image.color = new Color (1, 1, 1, 1);
+		CurrentType = chess;
+		chess.Position = new Vector2 (PosX, PosY);
+		image.sprite = MainController.ListChess [GetChess (chess)];
+		image.SetNativeSize ();
+		int temp = (int)chess.Type - 1;
+		if (temp < MainController.AddPosY.Count)
+			rect.localPosition = new Vector2 (0 , MainController.AddPosY[temp]);
 	}
 }

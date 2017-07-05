@@ -46,6 +46,8 @@ public class PlayGameController : MonoBehaviour {
 	public bool KINGsideCastling = true;//Nhập thành gần, quân trắng        
 	public bool QUEENsideCastling = true;//Nhập thành xa, quân trắng
 	public int CurrentLevel = 0;
+	public List<Vector2> CurrentMove = new List<Vector2>();
+	public List<Vector2> NextMove = new List<Vector2>();
 
 	void Awake() 
 	{
@@ -90,6 +92,8 @@ public class PlayGameController : MonoBehaviour {
 
 	private void NewGame()
 	{
+		CurrentMove.Clear ();
+		NextMove.Clear ();
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < 10; j++)
 				_BoardState [i , j] = 0;
@@ -116,7 +120,7 @@ public class PlayGameController : MonoBehaviour {
 				newChess.Position = new Vector2(int.Parse(parts[1]),int.Parse(parts[2]));
 				newChess.Type = (ChessPieceType)(int.Parse (parts [3]) + 1);
 				int index = newChess.IsWhite == ChessSide.White ? 2 : 1;
-				_BoardState[(int)newChess.Position.x + 1, (int)newChess.Position.y + 1] = (int)newChess.Type * 10 + index;
+				_BoardState[ 8 - (int)newChess.Position.x, (int)newChess.Position.y + 1] = (int)newChess.Type * 10 + index;
 				AllChess.Add (newChess);
 			}
 		}
@@ -140,12 +144,22 @@ public class PlayGameController : MonoBehaviour {
 			}
 		}
 
-		kingsideCastling = true;//Nhập thành gần, quân đen
-		queensideCastling = true;//Nhập thành xa, quân đen
+		if (CurrentGameMode != GameMode.Puzzle) 
+		{
+			kingsideCastling = true;//Nhập thành gần, quân đen
+			queensideCastling = true;//Nhập thành xa, quân đen
 
-		KINGsideCastling = true;//Nhập thành gần, quân trắng        
-		QUEENsideCastling = true;//Nhập thành xa, quân trắng
+			KINGsideCastling = true;//Nhập thành gần, quân trắng        
+			QUEENsideCastling = true;//Nhập thành xa, quân trắng
+		} 
+		else 
+		{
+			kingsideCastling = false;//Nhập thành gần, quân đen
+			queensideCastling = false;//Nhập thành xa, quân đen
 
+			KINGsideCastling = false;//Nhập thành gần, quân trắng        
+			QUEENsideCastling = false;//Nhập thành xa, quân trắng
+		}
 		clsFEN.SetFEN(this, "");
 
 		arrFEN = new ArrayList();
@@ -155,7 +169,7 @@ public class PlayGameController : MonoBehaviour {
 	public void SelectingThisCell(CellBase cell)
 	{
 
-		if (CurrentStatus != GameStatus.NowPlaying || isThinking)
+		if (CurrentStatus != GameStatus.NowPlaying || isThinking || isUndo)
 			return;
 
 		if (CurrentGameMode == GameMode.TwoPlayer || isWhite == ChessSide.Black) 
@@ -189,6 +203,10 @@ public class PlayGameController : MonoBehaviour {
 					_BoardState [ 8 - (int)preCell.PosX, (int)preCell.PosY + 1] = 0;
 					preCell.ClearPreCell ();
 					preCell.ClearView ();
+
+					CurrentMove.Add (new Vector2(preCell.PosX, preCell.PosY));
+					NextMove.Add (new Vector2(cell.PosX, cell.PosY));
+
 					preCell = null;
 				}
 
@@ -220,8 +238,67 @@ public class PlayGameController : MonoBehaviour {
 
 	public void UndoClick ()
 	{
-		isUndo = true;
-		arrFEN.RemoveAt(arrFEN.Count - 1);
+		if (CurrentGameMode == GameMode.Puzzle && isWhite == ChessSide.Black && CurrentMove.Count > 0 && !isUndo) 
+		{
+			isUndo = true;
+			StartCoroutine (delayUndo());
+		}
+	}
+
+	IEnumerator delayUndo() 
+	{
+		Undo ();
+		arrFEN.RemoveAt (arrFEN.Count - 1);
+		yield return new WaitForSeconds (0.5f);
+		Undo ();
+		arrFEN.RemoveAt (arrFEN.Count - 1);
+		isUndo = false;
+	}
+
+	private void Undo()
+	{
+		if (CurrentMove.Count > 0) 
+		{
+			int X = (int)CurrentMove [CurrentMove.Count - 1].x;
+			int Y = (int)CurrentMove [CurrentMove.Count - 1].y;
+			CurrentMove.RemoveAt (CurrentMove.Count - 1);
+
+			int X2 = (int)NextMove [NextMove.Count - 1].x;
+			int Y2 = (int)NextMove [NextMove.Count - 1].y;
+			NextMove.RemoveAt (NextMove.Count - 1);
+
+			CellBase curCell = new CellBase(), newCell = new CellBase();
+			foreach(var item in AllCell)
+			{
+				if (item.PosX == X && item.PosY == Y) 
+				{
+					curCell = item;
+				}
+
+				if (item.PosX == X2 && item.PosY == Y2) 
+				{
+					newCell = item;
+				}
+			}
+
+			if (newCell.CurrentType != null) 
+			{
+				curCell.SetView (newCell.CurrentType);
+
+				_BoardState [8 - (int)curCell.PosX, (int)curCell.PosY + 1] = 0;
+
+				_BoardState [8 - (int)newCell.CurrentType.Position.x, (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
+				newCell.ClearPreCell ();
+				newCell.ClearView ();
+//						Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
+//						for (int i = 0; i < 10; i++) {
+//							string tmp = "";
+//							for (int j = 0; j < 10; j++)
+//								tmp += _BoardState [i, j] + " ";
+//							Debug.LogError (tmp);
+//						}
+			}
+		}
 	}
 
 	private void ComputerMove()
@@ -239,7 +316,7 @@ public class PlayGameController : MonoBehaviour {
 		if (MyMove == null)
 		{
 			MyMove = new clsMove(new Vector2(), new Vector2());
-			arrMove = clsChessEngine.GenerateMove(this._BoardState, this.arrFEN, ChessSide.White, ref MyMove, Difficult);
+			arrMove = clsChessEngine.GenerateMove(this._BoardState, this.arrFEN, ChessSide.Black, ref MyMove, Difficult);
 			Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
 
 //			if (Difficult == GameDifficulty.Hard)
@@ -251,9 +328,16 @@ public class PlayGameController : MonoBehaviour {
 			arrMove = clsChessEngine.FindAllLegalMove(this._BoardState, MyMove.CurPos, eType);
 		}
 		LastMove = MyMove;
-		yield return null;
+		while (clsChessEngine.isProcessing)
+			yield return new WaitForEndOfFrame();
 		AiMove ();
-		Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
+//		Debug.LogError (MyMove.CurPos + "   " + MyMove.NewPos);
+//		for (int i = 0; i < 10; i++) {
+//			string tmp = "";
+//			for (int j = 0; j < 10; j++)
+//				tmp += _BoardState [i, j] + " ";
+//			Debug.LogError (tmp);
+//		}
 		isThinking = false;
 		isWhite = ChessSide.Black;
 		arrFEN.Add(clsFEN.GetPiecePlacementString(this._BoardState));
@@ -266,12 +350,12 @@ public class PlayGameController : MonoBehaviour {
 			CellBase curCell = new CellBase(), newCell = new CellBase();
 			foreach(var item in AllCell)
 			{
-				if (item.PosX == 8 - (int)MyMove.CurPos.x && item.PosY == 8 - (int)MyMove.CurPos.y) 
+				if (item.PosX == 8 - (int)MyMove.CurPos.x && item.PosY == (int)MyMove.CurPos.y - 1) 
 				{
 					curCell = item;
 				}
 
-				if (item.PosX == 8 - (int)MyMove.NewPos.x && item.PosY == 8 - (int)MyMove.NewPos.y) 
+				if (item.PosX == 8 - (int)MyMove.NewPos.x && item.PosY == (int)MyMove.NewPos.y - 1) 
 				{
 					newCell = item;
 				}
@@ -280,9 +364,14 @@ public class PlayGameController : MonoBehaviour {
 			if (curCell.CurrentType != null && curCell.CurrentType.IsWhite == ChessSide.White) 
 			{
 				newCell.SetView (curCell.CurrentType);
-				_BoardState [8 - (int)curCell.PosX, 8 - (int)curCell.PosY] = 0;
+				_BoardState [8 - (int)curCell.PosX, (int)curCell.PosY + 1] = 0;
+				curCell.ClearPreCell ();
 				curCell.ClearView ();
-				_BoardState [8 - (int)newCell.CurrentType.Position.x, 8 - (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
+
+				CurrentMove.Add (new Vector2(curCell.PosX, curCell.PosY));
+				NextMove.Add (new Vector2(newCell.PosX, newCell.PosY));
+
+				_BoardState [8 - (int)newCell.CurrentType.Position.x, (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
 			}
 		}
 	}
