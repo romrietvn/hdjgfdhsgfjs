@@ -24,7 +24,7 @@ public class PlayGameController : MonoBehaviour {
 	private List<CellBase> AllCell = new List<CellBase> ();
 	private List<ChessBase> AllChess = new List<ChessBase>();
 	private List<CellBase> TempCell = new List<CellBase>();
-	private CellBase preCell;
+	private CellBase preCell, currentCell;
 
 	private MapData currentMap;
 	public ChessSide isWhite = ChessSide.Black;
@@ -214,7 +214,7 @@ public class PlayGameController : MonoBehaviour {
 				Selecting.color = new Color (1, 1, 1, 0);
 
 				//arrMove = clsChessEngine.FindAllLegalMove(_BoardState, MyMove.CurPos, cell.CurrentType.Type);
-
+				currentCell = cell;
 				if (_BoardState [8 - (int)cell.PosX, (int)cell.PosY + 1] / 10 == 6) 
 				{
 					EndGame ();
@@ -225,6 +225,13 @@ public class PlayGameController : MonoBehaviour {
 					int X = 8 - (int)cell.PosX;
 					int Y = (int)cell.PosY + 1;
 					_BoardState [ X, Y] = (int)cell.CurrentType.Type * 10 + index;
+
+					if (currentCell.CurrentType.Position.y == 0 && currentCell.CurrentType.Type == ChessPieceType.Pawn) 
+					{
+						//PromotePawn (4);
+						Debug.LogError("Show popup chon co de phong cap \n 1: Tinh - 2: Ma - 3: Xe - 4: Hau");
+					}
+
 					isWhite = isWhite == ChessSide.Black ? ChessSide.White : ChessSide.Black;
 
 					arrFEN.Add(clsFEN.GetPiecePlacementString(this._BoardState));
@@ -370,8 +377,13 @@ public class PlayGameController : MonoBehaviour {
 
 				CurrentMove.Add (new Vector2(curCell.PosX, curCell.PosY));
 				NextMove.Add (new Vector2(newCell.PosX, newCell.PosY));
-
+				currentCell = newCell;
 				_BoardState [8 - (int)newCell.CurrentType.Position.x, (int)newCell.CurrentType.Position.y + 1] = (int)newCell.CurrentType.Type * 10 + 2;
+
+				if (newCell.CurrentType.Position.y == 7 && newCell.CurrentType.Type == ChessPieceType.Pawn) 
+				{
+					PromotePawn (4);
+				}
 			}
 		}
 	}
@@ -449,5 +461,17 @@ public class PlayGameController : MonoBehaviour {
 			CurrentStatus = GameStatus.WhiteWin;
 		else
 			CurrentStatus = GameStatus.BlackWin;
+	}
+
+	public void PromotePawn(int type) 
+	{
+		ChessPieceType newType = (ChessPieceType)(type + 1);
+		if (currentCell != null && currentCell.CurrentType != null) 
+		{
+			currentCell.CurrentType.Type = newType;
+			currentCell.SetView (currentCell.CurrentType);
+			int index = currentCell.CurrentType.IsWhite == ChessSide.White ? 2 : 1;
+			_BoardState [8 - (int)currentCell.CurrentType.Position.x, (int)currentCell.CurrentType.Position.y + 1] = (int)currentCell.CurrentType.Type * 10 + index;
+		}
 	}
 }
